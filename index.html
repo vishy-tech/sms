@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USSD Job Board Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>USSD Job Board Admin</h1>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Post New Job</h2>
+            <form id="jobForm">
+                <div class="form-group">
+                    <label for="title">Job Title</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" required>
+                        <option value="">Select Category</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Construction">Construction</option>
+                        <option value="Domestic">Domestic</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="salary">Salary/Compensation</label>
+                    <input type="text" id="salary" required>
+                </div>
+                <div class="form-group">
+                    <label for="incentive">Application Incentive (KSh)</label>
+                    <input type="number" id="incentive" value="50" required>
+                </div>
+                <button type="submit">Post Job</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2>Job Listings</h2>
+            <div class="table-container">
+                <table id="jobsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Salary</th>
+                            <th>Incentive</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Send USSD Message to Rural Users</h2>
+            <form id="ussdMessageForm">
+                <div class="form-group">
+                    <label for="ussdPhone">Phone Number</label>
+                    <input type="text" id="ussdPhone" required placeholder="+2547XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="ussdMessage">Message</label>
+                    <textarea id="ussdMessage" rows="3" required placeholder="Enter your message"></textarea>
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+            <div id="ussdMessageStatus"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Fetch jobs from the API and populate the table
+        function fetchJobs() {
+            fetch('http://localhost:3000/api/jobs')
+                .then(response => response.json())
+                .then(data => {
+                    const jobsTableBody = document.querySelector('#jobsTable tbody');
+                    jobsTableBody.innerHTML = ''; 
+                    data.forEach(job => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${job.id}</td>
+                            <td>${job.title}</td>
+                            <td>${job.category}</td>
+                            <td>${job.location}</td>
+                            <td>${job.salary}</td>
+                            <td>${job.incentive}</td>
+                            <td>
+                                <button class="edit-job" data-id="${job.id}">Edit</button>
+                                <button class="delete-job" data-id="${job.id}">Delete</button>
+                            </td>
+                        `;
+                        jobsTableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching jobs:', error));
+        }
+
+        // Call fetchJobs on page load
+        document.addEventListener('DOMContentLoaded', fetchJobs);
+    </script>
+</body>
+</html>
